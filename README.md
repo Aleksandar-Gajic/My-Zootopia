@@ -4,7 +4,7 @@ Animals Web Generator is a fun Python project that fetches animal data from the 
 
 ## Installation
 
-To install this project, simply clone the repository: git clone https://github.com/yourusername/animals-web-generator.git
+To install this project, simply clone the repository: git clone https://github.com/Aleksandar-Gajic/animals-web-generator.git
                                                       cd animals-web-generator
 
 Then install the required dependencies: pip install -r requirements.txt
