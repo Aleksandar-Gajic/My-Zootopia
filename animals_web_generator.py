@@ -1,16 +1,5 @@
-import requests
-
-API_KEY = "34tXITCkKSrsquItg33v9oiuzF244Zs31GOawgMx"
-
-def fetch_animals(animal_name):
-    url = "https://api.api-ninjas.com/v1/animals"
-    params = {"name": animal_name}
-    headers = {
-        "X-Api-Key": API_KEY
-    }
-
-    response = requests.get(url, params=params, headers=headers)
-    return response.json()
+import data_fetcher
+import os
 
 def serialize_animal(animal):
     output = '<li class="cards__item">\n'
@@ -34,24 +23,35 @@ def serialize_animal(animal):
     return output
 
 
-animal_name = input("Enter a name of an animal: ")
+def generate_website(animal_name):
+    animals_data = data_fetcher.fetch_data(animal_name)
 
-animals_data = fetch_animals(animal_name)
+    if len(animals_data) == 0:
+        output = f'<h2>The animal "{animal_name}" doesn\'t exist.</h2>'
+    else:
+        output = ""
+        for animal in animals_data:
+            output += serialize_animal(animal)
 
-output = ''
+    # Load template
+    template_path = os.path.join(os.path.dirname(__file__), 'animals_template.html')
+    with open(template_path, 'r') as f:
+        html_template = f.read()
 
-if len(animals_data) == 0:
-    output = f'<h2>The animal "{animal_name}" doesn\'t exist.</h2>'
-else:
-    for animal in animals_data:
-        output += serialize_animal(animal)
+    # Safe replace: placeholder nikada ne ostaje
+    if '__REPLACE_ANIMALS_INFO__' in html_template:
+        final_html = html_template.replace('__REPLACE_ANIMALS_INFO__', output)
+    else:
+        final_html = html_template + "\n" + output  # fallback
 
-with open('animals_template.html', 'r') as f:
-    html_template = f.read()
+    # Write output
+    output_path = os.path.join(os.path.dirname(__file__), 'animals.html')
+    with open(output_path, 'w') as f:
+        f.write(final_html)
 
-final_html = html_template.replace('__REPLACE_ANIMALS_INFO__', output)
+    print(f"Website was successfully generated to the file {output_path}")
 
-with open('animals.html', 'w') as f:
-    f.write(final_html)
 
-print("Website was successfully generated to the file animals.html.")
+if __name__ == "__main__":
+    animal_name = input("Please enter an animal: ")
+    generate_website(animal_name)
